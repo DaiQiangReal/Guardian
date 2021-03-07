@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Test from "pages/Test"
+import Main from "pages/Main"
+import 'antd/dist/antd.css';
 ReactDOM.render(
     <React.StrictMode>
-      <Test/>
+      <Main/>
     </React.StrictMode>,
     document.getElementById('root')
   );

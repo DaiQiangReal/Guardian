@@ -41,6 +41,28 @@ module.exports = {
         use: [
           // Creates `style` nodes from JS strings
           "style-loader",
+          'css-modules-typescript-loader',
+          // Translates CSS into CommonJS
+          {
+              loader:"css-loader",
+              options:{
+                sourceMap:isDev(),
+                  modules:{
+                      auto:true,
+                    localIdentName: '[name]__[local]--[hash:base64:5]',  
+                    exportGlobals: true,	// 注意！:global 声明全局样式需要该属性
+                  },  
+              }
+          },
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+      },
+      {
+        test: /\.css$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
           // Translates CSS into CommonJS
           {
               loader:"css-loader",
@@ -51,8 +73,6 @@ module.exports = {
                   },  
               }
           },
-          // Compiles Sass to CSS
-          "sass-loader",
         ],
       },
       {
