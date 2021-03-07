@@ -1,0 +1,31 @@
+{
+  "name": "@daiqiangreal/guardian",
+  "version": "0.1.0-alpha.1",
+  "description": "Cross platform guardian system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DaiQiangReal/Guardian.git"
+  },
+  "keywords": [
+    "cross",
+    "guardian",
+    "system"
+  ],
+  "author": "daiqiangreal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DaiQiangReal/Guardian/issues"
+  },
+  "homepage": "https://github.com/DaiQiangReal/Guardian#readme",
+  "devDependencies": {
+    "electron": "^12.0.0"
+  },
+  "dependencies": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
+}
