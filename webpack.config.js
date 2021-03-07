@@ -47,6 +47,25 @@ module.exports = {
           // }
         },
       },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          {
+              loader:"css-loader",
+              options:{
+                  modules:{  
+                    localIdentName: '[name]__[local]--[hash:base64:5]',  
+                    exportGlobals: true,	// 注意！:global 声明全局样式需要该属性
+                  },  
+              }
+          },
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+      },
     ],
   },
   devtool: isDev()?"source-map":false,
