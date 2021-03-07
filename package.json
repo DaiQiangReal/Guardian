@@ -2,9 +2,10 @@
   "name": "@daiqiangreal/guardian",
   "version": "0.1.0-alpha.1",
   "description": "Cross platform guardian system",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "export DEV='develop' && webpack serve",
+    "start:server": "export DEV='develop' && webpack serve",
+    "start:gui": "electron .",
     "build": "rm -rf dist && webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -35,6 +36,7 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "css-loader": "^5.1.1",
+    "css-modules-typescript-loader": "^4.0.1",
     "electron": "^12.0.0",
     "eslint": "^7.21.0",
     "eslint-plugin-react": "^7.22.0",
@@ -50,7 +52,6 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "antd": "^4.13.1",
-    "css-modules-typescript-loader": "^4.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   }
