@@ -12,7 +12,7 @@ export default class Main extends React.Component<MainProps, {}> {
     render() {
         return <div >
             <div className={styles['main']}>hellp</div>
-            <Button>test</Button>
+            <Button type="primary">test</Button>
         </div>;
     }
 }
