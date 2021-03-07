@@ -13,7 +13,10 @@ const presets=[
       ],
     ["@babel/preset-react",{
         development: process.env.DEV === "develop",
-    }]
+    }],
+    "@babel/preset-typescript"
+      
+    
 ];
 
 module.exports={

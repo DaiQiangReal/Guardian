@@ -7,7 +7,7 @@ const isDev=()=>process.env.DEV === "develop";
 module.exports = {
   mode: isDev()?"development":'production',
   entry: {
-    index: "./src/index.js",
+    index: "./src/index.tsx",
   },
   output: {
     // 打包文件根目录
@@ -25,26 +25,15 @@ module.exports = {
         pages:resolve('src/pages'),
         components:resolve('src/components')
     },
-    extensions:['.js','.jsx',',tsx','.json']
+    extensions:['.js','.jsx','.ts','.tsx','.json']
   },
   module: {
     rules: [
       {
-        test: /\.jsx?$/, // jsx/js文件的正则
+        test: /\.[jt]sx?$/, // jsx/js文件的正则
         include: resolve('src'),
         use: {
-          // loader 是 babel
           loader: "babel-loader",
-          // options: {
-          //     // babel 转义的配置选项
-          //     babelrc: false,
-          //     presets: [
-          //         // 添加 preset-react
-          //         require.resolve('@babel/preset-react'),
-          //         [require.resolve('@babel/preset-env'), {modules: false}]
-          //     ],
-          //     cacheDirectory: true
-          // }
         },
       },
       {
@@ -66,11 +55,23 @@ module.exports = {
           "sass-loader",
         ],
       },
+      {
+        test: /\.(jpe?g|png|gif|svg|woff|woff2|eot|ttf|otf)$/i,
+        type: "asset/resource",
+      },
     ],
   },
   devtool: isDev()?"source-map":false,
   devServer: {
     contentBase: "./build",
     port:8000,
+  },
+  cache: {
+    type: 'filesystem',
+    // 可选配置
+    buildDependencies: {
+      config: [__filename], // 当构建依赖的config文件（通过 require 依赖）内容发生变化时，缓存失效
+    },
+    name: 'development-cache',
   },
 };
