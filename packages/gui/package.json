@@ -1,0 +1,14 @@
+{
+  "name": "@daiqiangreal/guardian-gui",
+  "version": "1.0.0",
+  "description": "Cross platform guardian system electron gui part",
+  "main": "main.js",
+  "author": "daiqiangreal",
+  "license": "MIT",
+  "scripts": {
+    "start": "export DEV='develop' && electron ."
+  },
+  "dependencies": {
+    "electron": "^12.0.2"
+  }
+}

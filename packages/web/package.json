@@ -1,12 +1,10 @@
 {
-  "name": "@daiqiangreal/guardian",
+  "name": "@daiqiangreal/guardian-web",
   "version": "0.1.0-alpha.1",
-  "description": "Cross platform guardian system",
-  "main": "main.js",
+  "description": "Cross platform guardian system web part",
   "scripts": {
-    "start:server": "export DEV='develop' && webpack serve",
-    "start:gui": "export DEV='develop' && electron .",
-    "build": "rm -rf dist && webpack --mode production",
+    "start": "export DEV='develop' && webpack serve",
+    "build": "rm -rf dist && export buildType='web' && webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -37,7 +35,6 @@
     "babel-loader": "^8.2.2",
     "css-loader": "^5.1.1",
     "css-modules-typescript-loader": "^4.0.1",
-    "electron": "^12.0.0",
     "eslint": "^7.21.0",
     "eslint-plugin-react": "^7.22.0",
     "html-webpack-plugin": "^5.2.0",

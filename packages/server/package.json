@@ -1,0 +1,11 @@
+{
+  "name": "@daiqiangreal/guardian-server",
+  "version": "1.0.0",
+  "description": "Cross platform guardian system server part",
+  "main": "index.js",
+  "author": "daiqiangreal",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "^2.13.1"
+  }
+}

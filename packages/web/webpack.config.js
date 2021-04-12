@@ -10,11 +10,11 @@ module.exports = {
         index: "./src/index.tsx",
     },
     output: {
-    // 打包文件根目录
+        // 打包文件根目录
         path: path.resolve(__dirname, "dist/"),
     },
     plugins: [
-    // 生成 index.html
+        // 生成 index.html
         new HtmlWebpackPlugin({
             filename: "index.html",
             template: "./src/static/index.html",
@@ -96,3 +96,4 @@ module.exports = {
         name: 'development-cache',
     },
 };
+    
