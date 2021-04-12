@@ -21,6 +21,7 @@ module.exports = {
     // e.g. '@typescript-eslint/explicit-function-return-type': 'off',
         "react/display-name": 0,
         indent: ["error", 4],
+        "no-unused-vars":0
     },
     settings: {
         react: {
