@@ -1,8 +1,9 @@
-const Koa = require('koa');
-const app = new Koa();
+import Server from "./server";
 
-app.use(async ctx => {
-  ctx.body = 'Hello World';
-});
-
-app.listen(3000);
+(async () => {
+  const server = new Server(null, 3000);
+  server.setRoute("/test", "get", (ctx) => {
+    ctx.response.body = JSON.stringify(ctx, null, " ");
+  });
+  server.start();
+})();

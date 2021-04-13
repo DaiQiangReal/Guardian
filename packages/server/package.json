@@ -6,13 +6,17 @@
   "author": "daiqiangreal",
   "license": "MIT",
   "scripts": {
+    "start": "esbuild src/index.ts --bundle --outfile=./dist/server.dev.js --define:DEBUG=true --platform=node && node ./dist/server.dev.js",
     "build": "esbuild src/index.ts --bundle --outfile=./dist/server.js --platform=node"
   },
   "dependencies": {
-    "koa": "^2.13.1"
+    "koa": "^2.13.1",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/koa": "^2.13.1",
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^14.14.37",
     "esbuild": "^0.11.9",
     "typescript": "^4.2.4"
   }
