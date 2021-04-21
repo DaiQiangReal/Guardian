@@ -1,6 +1,7 @@
 import { Context } from "koa";
 import Koa from "koa";
 import lodash from "lodash-es";
+import Database from './Database';
 
 type routeCallback = (ctx: Context) => void;
 
@@ -17,12 +18,14 @@ export default class Server {
   readonly serverIP: string;
   readonly serverPort: number;
   readonly route: route;
+  readonly database: Database;
 
   constructor(ip = "0.0.0.0", port = 3000) {
     this.server = new Koa();
     this.serverIP = ip;
     this.serverPort = port;
     this.route = {};
+    this.database=new Database({databasePath:'./database.json'});
   }
 
   setRoute = (url: string, method: "get" | "post", callback: routeCallback) => {
@@ -33,13 +36,13 @@ export default class Server {
     };
   };
 
-  private _router = (ctx: Context) => {
+  private _router = async (ctx: Context) => {
     const route = this.route;
     const { request } = ctx;
-    const url = request.url;
+    const path = request.path;
     const method = request.method.toLocaleLowerCase();
-    const callback = lodash.get(route, [url, method], () => {});
-    callback(ctx);
+    const callback = lodash.get(route, [path, method], () => {});
+    await callback(ctx);
   };
 
   start = (ip = this.serverIP, port = this.serverPort) => {
@@ -51,7 +54,7 @@ export default class Server {
 
     this.server.use(async (ctx, next) => {
       const start = Date.now();
-      this._router(ctx);
+      await this._router(ctx);
       await next();
       const ms = Date.now() - start;
       ctx.set("X-Response-Time", `${ms}ms`);
