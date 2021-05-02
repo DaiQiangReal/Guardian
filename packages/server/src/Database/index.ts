@@ -27,8 +27,8 @@ class Database {
     private config: Config;
     private writeToDisk: Function;
     private writeToDiskPromise: PromiseLike<void>;
-    private dirty: boolean;
-    
+    private dirty: number;
+
     constructor(config: Config) {
         this.config = {
             writeCacheSize: 10,
@@ -39,21 +39,21 @@ class Database {
         this.init(config.databasePath);
         this.readTaskMap = new Map();
         this.writeTaskMap = new Map();
-        this.writeToDisk = lodash.throttle(this._writeToDisk, this.config.writeCacheDebounce)
         this.overrideMapSet();
+        this.writeToDisk = lodash.throttle(this._writeToDisk, this.config.writeCacheDebounce)
         this.writeToDiskPromise = Promise.resolve();
-        this.dirty=false;
+        this.dirty = 0;
     }
 
     private init = (databasePath: string) => {
         try {
-            databasePath=path.resolve(databasePath);
-            if(!fsExtra.existsSync(databasePath)){
-                fsExtra.writeJSONSync(databasePath,{});
+            databasePath = path.resolve(databasePath);
+            if (!fsExtra.existsSync(databasePath)) {
+                fsExtra.writeJSONSync(databasePath, {});
             }
             const database = fsExtra.readJSONSync(path.resolve(databasePath));
             this.database = database;
-            setInterval(()=>this.writeToDisk(),this.config.writeCacheTime);
+            setInterval(() => this.writeToDisk(), this.config.writeCacheTime);
             console.log('Loading database file success.\n\n');
 
         } catch (e) {
@@ -76,6 +76,7 @@ class Database {
     public write = async (target: string | string[], value: basic) => {
         const id = `${new Date().getTime()}_write_${target}`;
         this.createWriteProcess({ id, method: 'write', target, value })
+
     }
 
     private createReadProcess = (operation: Operation) => {
@@ -106,33 +107,33 @@ class Database {
 
     private overrideMapSet = () => {
         const self = this;
-        const database = this.database;
         let cacheSize = 0;
-        new Proxy(database, {
+        this.database = new Proxy(this.database, {
             set: (target, key, value) => {
-                    target[key] = value;
-                    cacheSize++;
-                    if (cacheSize > self.config.writeCacheSize) {
-                        cacheSize = 0;
-                        this.dirty=true;
-                        this.writeToDisk();
-                    }
-           
+                target[key] = value;
+                cacheSize++;
+                if (cacheSize > self.config.writeCacheSize) {
+                    cacheSize = 0;
+                    this.writeToDisk();
+                } else {
+                    this.dirty++;
+                }
                 return true;
             }
         })
     }
 
     private _writeToDisk = async () => {
-        if(this.dirty){
-            const { databasePath } = this.config;
-        this.writeToDiskPromise.then(async ()=>await fsExtra.writeJSON(databasePath, this.database));
-        this.dirty=false;
+        const { databasePath } = this.config;
+        const currentDirtyCount = this.dirty;
+        if (this.dirty > 0) {
+            this.writeToDiskPromise = this.writeToDiskPromise.then(async () => {
+                await fsExtra.writeJSON(databasePath, this.database);
+                this.dirty -= currentDirtyCount;
+            });
         }
-        
+
     }
-
-
 
     public exit = async () => {
         await this.writeToDiskPromise;

@@ -5,33 +5,45 @@ import lodash from "lodash-es";
 (async () => {
   const server = new Server(null, 3000);
 
-  
 
-  server.setRoute("/test", "get", (ctx:Context) => {
+
+  server.setRoute("/test", "get", (ctx: Context) => {
     ctx.response.body = JSON.stringify(ctx, null, " ");
   });
 
-  server.setRoute("/get","get",async (ctx:Context)=>{
-    const {query}=ctx.request;
-    const data=await server.database.read(query.target);
-    if(data){
-      ctx.response.body=data
-    }else{
-      ctx.response.status=404
+
+  server.setRoute("/get", "get", async (ctx: Context) => {
+    const { query } = ctx.request;
+    const data = await server.database.read(query.target);
+    console.log('data', data);
+
+    if (data) {
+      ctx.response.body = data
+    } else {
+      ctx.response.status = 404
     }
-    
+
   })
 
-  server.setRoute("/set","post",async (ctx:Context)=>{
-    let queryStr="";
-    ctx.req.on('data',(data)=>queryStr+=data);
-    await new Promise<void>((resolve)=>{
-      ctx.req.on('end',()=>{   
+  server.setRoute("/set", "post", async (ctx: Context) => {
+    let queryStr = "";
+    ctx.req.on('data', (data) => queryStr += data);
+    await new Promise<void>((resolve) => {
+      ctx.req.on('end', () => {
         resolve();
       })
     })
-    const queryObject=lodash.fromPairs(queryStr.split('&').map(singleQueryStr=>singleQueryStr.split('=')));
-    ctx.response.body=queryObject;
+    const queryObject = lodash.fromPairs(queryStr.split('&').map(singleQueryStr => singleQueryStr.split('=')));
+    const { target, data } = queryObject;
+    if (!target || !data) {
+      ctx.response.body = `Error: set require target && data`;
+      ctx.response.status = 404;
+    } else {
+      server.database.write(target, data);
+      ctx.response.body = queryObject;
+      ctx.response.status=200;
+    }
+
   })
 
   server.start();

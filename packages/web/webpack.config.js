@@ -10,7 +10,6 @@ module.exports = {
         index: "./src/index.tsx",
     },
     output: {
-        // 打包文件根目录
         path: path.resolve(__dirname, "dist/"),
     },
     plugins: [
@@ -30,7 +29,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.[jt]sx?$/, // jsx/js文件的正则
+                test: /\.[jt]sx?$/, 
                 include: resolve('src'),
                 use: {
                     loader: "babel-loader",
@@ -39,10 +38,8 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/i,
                 use: [
-                    // Creates `style` nodes from JS strings
                     "style-loader",
                     'css-modules-typescript-loader',
-                    // Translates CSS into CommonJS
                     {
                         loader:"css-loader",
                         options:{
@@ -50,27 +47,25 @@ module.exports = {
                             modules:{
                                 auto:true,
                                 localIdentName: '[name]__[local]--[hash:base64:5]',  
-                                exportGlobals: true,	// 注意！:global 声明全局样式需要该属性
+                                exportGlobals: true,
                             },  
                         }
                     },
-                    // Compiles Sass to CSS
+
                     "sass-loader",
                 ],
             },
             {
                 test: /\.css$/i,
                 use: [
-                    // Creates `style` nodes from JS strings
                     "style-loader",
-                    // Translates CSS into CommonJS
                     {
                         loader:"css-loader",
                         options:{
                             modules:{
                                 auto:true,
                                 localIdentName: '[name]__[local]--[hash:base64:5]',  
-                                exportGlobals: true,	// 注意！:global 声明全局样式需要该属性
+                                exportGlobals: true,
                             },  
                         }
                     },
@@ -89,7 +84,6 @@ module.exports = {
     },
     cache: {
         type: 'filesystem',
-        // 可选配置
         buildDependencies: {
             config: [__filename], // 当构建依赖的config文件（通过 require 依赖）内容发生变化时，缓存失效
         },
