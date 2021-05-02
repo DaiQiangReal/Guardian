@@ -9,8 +9,8 @@ import SideNav from '../../components/SideNav'
 export default () => {
 
 
-    return <div >
-        <SideNav/>
+    return <div cla>
+        <SideNav navData={['dawd','dwadawdwadawd','42455']} onSelect={(key)=>console.log(key)}/>
        
     </div>;
 
