@@ -1,7 +1,7 @@
 import { Context } from "koa";
 import Server from "./server";
 import lodash from "lodash-es";
-
+import UserContext from './userContext';
 (async () => {
   const server = new Server(null, 3000);
 
@@ -44,6 +44,11 @@ import lodash from "lodash-es";
       ctx.response.status=200;
     }
 
+  })
+
+  server.setWsRoute('/',async (ctx)=>{
+    const ws:WebSocket=await ctx.ws();
+    new UserContext(server.database,ws);
   })
 
   server.start();
