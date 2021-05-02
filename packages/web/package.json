@@ -49,6 +49,8 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "antd": "^4.13.1",
+    "echarts": "^5.1.1",
+    "echarts-for-react": "^3.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   }
