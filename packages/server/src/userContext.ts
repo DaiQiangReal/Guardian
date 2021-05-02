@@ -29,10 +29,9 @@ class UserContext{
 
     private init=()=>{
         this.ws.addEventListener('message',(e)=>{
-            
             let msgObj=JSONparse(e.data);
             const {method,data}=msgObj;
-            const methodFunc:Function=lodash.get(this,method,()=>{});
+            const methodFunc:Function=lodash.get(this.avaliableFuncs,method,()=>{});
             methodFunc(data);
         })
         const listenerCancelCallback=this.database.addDataChangedListener(this.onDataChanged);
@@ -40,11 +39,12 @@ class UserContext{
     }
 
     private subscribe=({subscribedKey}:{subscribedKey: any})=>{
-        this.subscribedKey=subscribedKey;
+        this.subscribedKey=subscribedKey;   
     }
 
 
     private onDataChanged=(data:any,target:string|string[],value:basic)=>{
+
         if(lodash.get(this.subscribedKey,target,false)){
             this.sendChangedMessage(target,value);
         }

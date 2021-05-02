@@ -28,7 +28,7 @@ class Database {
     private writeToDisk: Function;
     private writeToDiskPromise: PromiseLike<void>;
     private dirty: number;
-    private notifyChangeListenerCollection: Map<string,Function>;
+    private notifyChangeListenerCollection: Map<string, Function>;
 
     constructor(config: Config) {
         this.config = {
@@ -37,7 +37,7 @@ class Database {
             writeCacheDebounce: 1000,
             ...config
         }
-        this.notifyChangeListenerCollection=new Map();
+        this.notifyChangeListenerCollection = new Map();
         this.init(config.databasePath);
         this.readTaskMap = new Map();
         this.writeTaskMap = new Map();
@@ -77,10 +77,11 @@ class Database {
 
     public write = async (target: string | string[], value: basic) => {
         const id = `${new Date().getTime()}_write_${target}`;
-        Array.from(this.notifyChangeListenerCollection.values())
-        .forEach(async (listener)=>listener(this.database,target, value));
-        this.createWriteProcess({ id, method: 'write', target, value })
-
+        if (lodash.get(this.database, target, null) !== value) {
+            Array.from(this.notifyChangeListenerCollection.values())
+                .forEach(async (listener) => listener(this.database, target, value));
+            this.createWriteProcess({ id, method: 'write', target, value })
+        }
     }
 
     private createReadProcess = (operation: Operation) => {
@@ -139,10 +140,10 @@ class Database {
 
     }
 
-    addDataChangedListener=(listener:(data:any,target:string|string[],value:basic)=>any)=>{
-        let listenerKey=new Date().getTime()+''+Math.random()
-        this.notifyChangeListenerCollection.set(new Date().getTime()+''+Math.random(),listener);
-        return ()=>this.notifyChangeListenerCollection.delete(listenerKey);
+    addDataChangedListener = (listener: (data: any, target: string | string[], value: basic) => any) => {
+        let listenerKey = new Date().getTime() + '' + Math.random()
+        this.notifyChangeListenerCollection.set(new Date().getTime() + '' + Math.random(), listener);
+        return () => this.notifyChangeListenerCollection.delete(listenerKey);
     }
 
     public exit = async () => {
