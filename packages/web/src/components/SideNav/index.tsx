@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Menu, Button } from 'antd';
 
 import {MenuUnfoldOutlined,MenuFoldOutlined} from '@ant-design/icons';
-
+import './index.scss'
 
 export default ({navData=[],onSelect}:{navData:string[],onSelect:(key)=>void}):JSX.Element => {
     const [collapsed, setCollapsed] = useState(false);
@@ -12,12 +12,12 @@ export default ({navData=[],onSelect}:{navData:string[],onSelect:(key)=>void}):J
     };
 
     return <div style={{ width: 256 }}>
-        <Button type="primary" onClick={toggleCollapsed} style={{ marginBottom: 16 }}>
+        {/* <Button type="primary" onClick={toggleCollapsed} style={{ marginBottom: 16 }}>
             {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
-        </Button>
+        </Button> */}
         <Menu
-            mode="inline"
             theme="dark"
+            style={{'height':'100vh'}}
             inlineCollapsed={collapsed}
             onSelect={({key})=>{
                 onSelect(key);           
