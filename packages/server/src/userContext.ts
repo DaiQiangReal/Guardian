@@ -3,6 +3,7 @@ import lodash from 'lodash-es';
 
 type basic = number | string | boolean;
 
+
 const JSONparse=(string:string)=>{
     try{
         return JSON.parse(string);
