@@ -3,7 +3,7 @@ import Koa from "koa";
 import lodash from "lodash-es";
 import Database from './Database';
 import websocket from 'koa-easy-ws';
-
+import cors from 'koa-cors';
 type routeCallback = (ctx: Context) => void;
 
 interface route {
@@ -67,12 +67,8 @@ export default class Server {
   }
 
   start = (ip = this.serverIP, port = this.serverPort) => {
-    // this.server.use(async (ctx, next) => {
-    //   await next();
-    //   const rt = ctx.response.get("X-Response-Time");
-    //   console.log(`${ctx.method} ${ctx.url} - ${rt}`);
-    // });
-
+    
+    this.server.use(cors());
     this.server.use(websocket());
 
     this.server.use(async (ctx:Context, next) => {

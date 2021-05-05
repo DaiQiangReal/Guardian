@@ -14,8 +14,14 @@ import UserContext from './userContext';
 
   server.setRoute("/get", "get", async (ctx: Context) => {
     const { query } = ctx.request;
-    const data = await server.database.read(query.target);
-    console.log('data', data);
+    let data=null;
+  
+    if(query.target){
+      data = await server.database.read(query.target);
+    }else{
+      data = await server.database.read('*');
+    }
+    
 
     if (data) {
       ctx.response.body = data

@@ -87,6 +87,11 @@ class Database {
     private createReadProcess = (operation: Operation) => {
         const { id, target, callback } = operation;
         const task = new Promise<void>((resolve) => {
+            if(target==='*'){
+                callback(this.database);
+                resolve();
+                return;
+            }
             const data = lodash.get(this.database, target, null);
             callback(data);
             resolve();
