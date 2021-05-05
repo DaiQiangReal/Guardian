@@ -1,6 +1,7 @@
-import React, { ReactElement, useMemo } from 'react';
-import { Column } from '@ant-design/charts'
+import React, { useState, useEffect, useMemo, ReactElement } from 'react';
+import { Area } from '@ant-design/charts';
 import Title from 'components/Title';
+
 
 interface props {
     title: string,
@@ -25,17 +26,34 @@ export default ({ title = "",data,xName,yName}: props): ReactElement => {
 
     const config = useMemo(()=>({
         seriesField:'name',
-        height: 400,
         xField: xName,
         yField: yName,
         isGroup: true,
         point: {
             size: 5,
         },
+        annotations: [
+            {
+                type: 'text',
+                position: ['min', 'median'],
+                content: '中位数',
+                offsetY: -4,
+                style: { textBaseline: 'bottom' },
+            },
+            {
+                type: 'line',
+                start: ['min', 'median'],
+                end: ['max', 'median'],
+                style: {
+                    stroke: 'red',
+                    lineDash: [2, 2],
+                },
+            },
+        ],
     }),[xName,yName])
     return <div className={'line'}>
         <Title title={title} x={xName} y={yName}/>
-        <Column {...config} data={graphData} />;
+        <Area {...config} data={graphData} />;
     </div>
 
 }

@@ -1,11 +1,14 @@
 import React from 'react';
 import './title.scss'
 interface props{
-    title:string
+    title:string,
+    x:string,
+    y:string
 }
 
-export default ({title=''}:props)=>{
+export default ({title='',x=null,y=null}:props)=>{
     return <div className={'title'}>
-        {title}
+        <span className={'titleText'}>{title}</span>
+        {x&&y&&<span className={'axis'}>{`${y} / ${x}`}</span>}
     </div>
 }

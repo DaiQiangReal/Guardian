@@ -19,13 +19,13 @@ const DemoScatter: React.FC = () => {
         data: data,
         xField: 'xG conceded',
         yField: 'Shot conceded',
-        shape: 'custom-shape',
-        pointStyle: { fillOpacity: 1, fill: 'skyblue' },
+        // shape: 'custom-shape',
+        // pointStyle: { fillOpacity: 1, fill: 'skyblue' },
        
-        tooltip: {
-            showMarkers: false,
-            fields: ['xG conceded', 'Shot conceded'],
-        },
+        // tooltip: {
+        //     showMarkers: false,
+        //     fields: ['xG conceded', 'Shot conceded'],
+        // },
     };
     return <Scatter {...config} />;
 };
