@@ -91,11 +91,24 @@ class Database {
                 callback(this.database);
                 resolve();
                 return;
+            }else if(target==='allkeys'){
+
+                callback(JSON.stringify(this.database,(key,value)=>{
+                    if(key==='data'){
+                        return undefined;
+                    }else{
+                        return value;
+                    }
+                }))
+                resolve();
+                return;
             }
+            
             const data = lodash.get(this.database, target, null);
             callback(data);
             resolve();
         }).then(() => this.readTaskMap.delete(id));
+        
         this.readTaskMap.set(id, task);
         return task;
     }
