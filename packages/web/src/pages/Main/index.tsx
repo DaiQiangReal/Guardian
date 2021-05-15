@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SideNav from "../../components/SideNav";
 import Line from "../../components/Line";
 import Column from "../../components/Column";
@@ -11,7 +11,8 @@ import { Input, notification } from "antd";
 import { CloseCircleTwoTone } from "@ant-design/icons";
 import { Button } from "@material-ui/core";
 import lodash from "lodash-es";
-import getData from '../../getData';
+import getData,{getGraphData} from '../../getData';
+import WebsocketListener from '../../websocket';
 const { Search } = Input;
 
 export default () => {
@@ -19,6 +20,28 @@ export default () => {
     const [serverIPModalShow, setServerIPModalShow] = useState(false);
     const [data, setData] = useState({});
     const [currentCategory, setCurrentCategory] = useState(null);
+    const [limit,setLimit]=useState({});
+    const ref=useRef({
+        websocketListener:null
+    });
+    const defaultLimit=Number.MAX_SAFE_INTEGER;
+
+    const onDataChanged=useCallback((target,value)=>{
+        lodash.set(data,target,value);
+        setData({
+            ...data
+        })
+    },[data]);
+
+    ref.current.websocketListener?.setDataChangeListener(onDataChanged);
+
+    const category = useMemo(() => {
+        const category = Object.keys(data);
+        setCurrentCategory(category[0]);
+        ref.current.websocketListener?.subscribe([category]);
+        return category;
+    }, [data]);
+
     useEffect(() => {
         serverIP &&
             (async () => {
@@ -27,11 +50,13 @@ export default () => {
                     requestUrl = "http://" + requestUrl;
                 }
                 try {
-                    const { data } = await axios.get(requestUrl + "/get");
-                    const data2=await getData(requestUrl);
-                    console.log('data',data,data2);
-
-                    setData(data2);
+                    const data=await getData(requestUrl,defaultLimit);
+                    if(ref.current.websocketListener){
+                        ref.current.websocketListener.close();
+                    }
+                    ref.current.websocketListener=new WebsocketListener(serverIP);
+                    ref.current.websocketListener?.subscribe([Object.keys(data)[0]]);
+                    setData(data);
                 } catch (e) {
                     notification.open({
                         message: "获取数据错误",
@@ -43,11 +68,42 @@ export default () => {
             })();
     }, [serverIP]);
 
-    const category = useMemo(() => {
-        const category = Object.keys(data);
-        setCurrentCategory(category[0]);
-        return category;
-    }, [data]);
+   
+
+    // const reflashNewData=async (graphName,method:'add'|'reduce')=>{
+    //     const graphLimit=lodash.get(limit,graphName,defaultLimit);
+    //     let userStart;
+    //     let userEnd;
+    //     if(method==='add'){
+    //         userStart=lodash.get(ref.current,[graphName,1],0);
+    //         userEnd=userStart+graphLimit;    
+    //     }else{
+    //         userStart=lodash.get(ref.current,[graphName,1],0)
+    //     }
+    //     const requesed=await getGraphData(serverIP,currentCategory,graphName,userStart,userEnd);
+    //     console.log('test',userStart,userEnd,requesed);
+        
+    //     const [newGraphData,dataStart,dataEnd]=requesed;
+    //     lodash.set(ref.current,graphName,[dataStart,dataEnd]);
+
+    //     const originData=lodash.get(data,[currentCategory,graphName,'data'],[]);
+    //     for(let i=Number(dataStart),j=0;i<=dataEnd;i++,j++){
+    //         originData[i]=newGraphData[j];
+    //     }
+    //     console.log(originData);
+        
+    //     lodash.set(data,[currentCategory,graphName,'data'],originData);
+    //     console.log(data);
+        
+    //     setData({
+    //         ...data
+    //     })
+
+      
+        
+    // }
+
+    
 
     const generatorGraphMap = (
         singleCategoryData: any,
@@ -69,12 +125,10 @@ export default () => {
                 const { type, xName, yName, data: graphData } = singleCategoryData[
                     graphName
                 ];
-                console.log( singleCategoryData[
-                    graphName
-                ]);
-                
+
                 switch (type) {
                 case `line`: {
+                   
                     graphComponentsMap[graphName] = (
                         <Line
                             key={graphName}
@@ -82,6 +136,17 @@ export default () => {
                             yName={yName}
                             title={graphName}
                             data={graphData}
+                            //     onRangeAdd={
+                            //         ()=>{
+                            //             reflashNewData(graphName,'add')
+                            //         }
+                            //     }
+                            //     onRangeReduce={()=>{
+                    
+                            //         reflashNewData(graphName,'reduce')
+                            
+                        
+                        // }}
                         />
                     );
                     break;

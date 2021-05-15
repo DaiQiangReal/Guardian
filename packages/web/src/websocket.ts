@@ -13,23 +13,42 @@ const JSONparse=(string:string)=>{
 
 export default class WebsocketListener{
     private readonly ws: WebSocket;
-    private subscribedKey:any;
     readonly avaliableFuncs: {[key:string]:Function};
+    private promise:Promise<void>;
+    private onDataChangedInProps: Function;
     constructor(url:string) {
         let websocketServerUrl=url;
-        if(/^ws/.test(websocketServerUrl)){
+        if(!/^ws/.test(websocketServerUrl)){
             websocketServerUrl='ws://'+websocketServerUrl;
         }
-        this.ws=new WebSocket(url); 
+        this.ws=new WebSocket(websocketServerUrl); 
+        this.promise=new Promise(resolve=>{
+            this.ws.onopen=()=>{
+                resolve();
+            }
+        })
+        
         this.avaliableFuncs={
-            oNDataChanged:this.onDataChanged,
+            onDataChanged:this.onDataChanged,
         }
         this.init();
+    }
+
+    subscribe=(subscribedKey:any[])=>{
+        this.promise.then(()=>{
+            this.ws.send(JSON.stringify({
+                method:'subscribe',
+                data:subscribedKey
+            }));
+        })
+
     }
 
     private init=()=>{
         this.ws.addEventListener('message',(e)=>{
             const msgObj=JSONparse(e.data);
+            console.log('message',msgObj);
+            
             const {method,data}=msgObj;
             const methodFunc:Function=lodash.get(this.avaliableFuncs,method,()=>{});
             methodFunc(data);
@@ -37,10 +56,17 @@ export default class WebsocketListener{
     }
 
 
+    close=()=>{
+        this.ws.close();
+    }
 
+    setDataChangeListener=(callback)=>{
+        this.onDataChangedInProps=callback;
+        console.log('callback',callback);
+        
+    }
 
     onDataChanged=({target,value})=>{
-        console.log('websocket',target,value);
-        
+        this.onDataChangedInProps(target,value)
     }
 }

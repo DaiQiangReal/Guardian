@@ -45,7 +45,7 @@ import UserContext from './userContext';
       ctx.response.body = `Error: set require target && data`;
       ctx.response.status = 404;
     } else {
-      server.database.write(target, data);
+      server.database.write(decodeURI(target), decodeURI(data));
       ctx.response.body = queryObject;
       ctx.response.status=200;
     }

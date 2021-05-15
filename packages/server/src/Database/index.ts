@@ -79,7 +79,7 @@ class Database {
         const id = `${new Date().getTime()}_write_${target}`;
         if (lodash.get(this.database, target, null) !== value) {
             Array.from(this.notifyChangeListenerCollection.values())
-                .forEach(async (listener) => listener(this.database, target, value));
+                .forEach(async (listener) => listener(this.database, target, value));        
             this.createWriteProcess({ id, method: 'write', target, value })
         }
     }
@@ -161,6 +161,7 @@ class Database {
     addDataChangedListener = (listener: (data: any, target: string | string[], value: basic) => any) => {
         let listenerKey = new Date().getTime() + '' + Math.random()
         this.notifyChangeListenerCollection.set(new Date().getTime() + '' + Math.random(), listener);
+
         return () => this.notifyChangeListenerCollection.delete(listenerKey);
     }
 

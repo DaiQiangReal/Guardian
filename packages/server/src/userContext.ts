@@ -16,12 +16,12 @@ const JSONparse=(string:string)=>{
 class UserContext{
     readonly database: Database;
     readonly ws: WebSocket;
-    private subscribedKey:any;
+    private subscribedKey:any[];
     readonly avaliableFuncs: {[key:string]:Function};
     constructor(database:Database,ws:WebSocket) {
         this.database=database;
         this.ws=ws;
-        this.subscribedKey={};
+        this.subscribedKey=[];
         this.avaliableFuncs={
             subscribe:this.subscribe,
         }
@@ -30,8 +30,8 @@ class UserContext{
 
     private init=()=>{
         this.ws.addEventListener('message',(e)=>{
-            let msgObj=JSONparse(e.data);
-            const {method,data}=msgObj;
+            let msgObj=JSONparse(e.data);    
+            const {method,data}=msgObj;     
             const methodFunc:Function=lodash.get(this.avaliableFuncs,method,()=>{});
             methodFunc(data);
         })
@@ -39,16 +39,26 @@ class UserContext{
         this.ws.addEventListener('close',listenerCancelCallback);
     }
 
-    private subscribe=({subscribedKey}:{subscribedKey: any})=>{
-        this.subscribedKey=subscribedKey;   
+    private subscribe=(subscribedKey:any[])=>{
+        this.subscribedKey=subscribedKey;
+
     }
 
 
     private onDataChanged=(data:any,target:string|string[],value:basic)=>{
 
-        if(lodash.get(this.subscribedKey,target,false)){
-            this.sendChangedMessage(target,value);
+        if(Array.isArray(target)){
+            target=target.join('.');
         }
+
+        for(let key of this.subscribedKey){
+            if(target.indexOf(key)!==-1){
+                this.sendChangedMessage(target,value);
+                break;
+            }
+
+        }
+        
 
     }
 

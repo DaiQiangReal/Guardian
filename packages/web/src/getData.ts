@@ -1,8 +1,11 @@
 import axios from 'axios';
-import lodash from 'lodash-es';
+import lodash, { range } from 'lodash-es';
 
 
 function getRequestFunc(serverIP){
+    if(!(/http/.test(serverIP))){
+        serverIP='http://'+serverIP;
+    }
     return async (target:string)=>{
         return (await axios.get(serverIP+'/get',{
             params:{
@@ -12,32 +15,32 @@ function getRequestFunc(serverIP){
     }
 }
 
-const getGraphData=async (serverIP:string,category:string,graphName:string,rangeStart:number,rangeEnd:number)=>{
+export const getGraphData=async (serverIP:string,category:string,graphName:string,rangeStart:number,rangeEnd:number)=>{
 
     const request=getRequestFunc(serverIP);
-    const graphLength= Number(await request(`${category}.${graphName}.data.length}`));
-    if(Math.abs(rangeStart-rangeEnd+1)>length){
-        rangeStart=0;
-        rangeEnd=graphLength;
-    }
+
 
     const dataArray=[];
     for(let i=rangeStart;i<=rangeEnd;i++){
-        dataArray.push(await request(`${category}.${graphName}.data.${i}`));
+        const aData=await request(`${category}.${graphName}.data.${i}`)
+        if(!aData){
+            return [dataArray,rangeStart,i-1];
+        }else{
+            dataArray.push(aData);
+        }
     }
 
-    return dataArray
+    return [dataArray,rangeStart,rangeEnd]
 
 
 }
 
 
-// export 
 
 
-export default async (serverIP:string)=>{
 
-    const limit=5;
+export default async (serverIP:string,limit:number)=>{
+
     const request=getRequestFunc(serverIP);
 
     const data= await request('allkeys')
