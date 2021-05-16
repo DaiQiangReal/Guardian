@@ -17,7 +17,7 @@ interface Config {
     databasePath: string,
     writeCacheSize?: number,
     writeCacheTime?: number,
-    writeCacheDebounce?: number
+    writeCacheThrottle?: number
 }
 
 class Database {
@@ -34,15 +34,14 @@ class Database {
         this.config = {
             writeCacheSize: 10,
             writeCacheTime: 1000,
-            writeCacheDebounce: 1000,
+            writeCacheThrottle: 1000,
             ...config
         }
         this.notifyChangeListenerCollection = new Map();
         this.init(config.databasePath);
         this.readTaskMap = new Map();
         this.writeTaskMap = new Map();
-        this.overrideMapSet();
-        this.writeToDisk = lodash.throttle(this._writeToDisk, this.config.writeCacheDebounce)
+        this.writeToDisk = lodash.throttle(this._writeToDisk, this.config.writeCacheThrottle)
         this.writeToDiskPromise = Promise.resolve();
         this.dirty = 0;
     }
@@ -80,7 +79,8 @@ class Database {
         if (lodash.get(this.database, target, null) !== value) {
             Array.from(this.notifyChangeListenerCollection.values())
                 .forEach(async (listener) => listener(this.database, target, value));        
-            this.createWriteProcess({ id, method: 'write', target, value })
+            this.createWriteProcess({ id, method: 'write', target, value });
+            
         }
     }
 
@@ -121,34 +121,25 @@ class Database {
             if (!value) {
                 resolve();
             }
-            lodash.set(this.database, target, value);
+            if(isNaN(Number(value))){
+                lodash.set(this.database, target, value);
+            }else{
+                lodash.set(this.database, target, Number(value));
+            }
+            
+            this.writeToDisk();
+            this.dirty++;
             resolve();
         }).then(() => this.writeTaskMap.delete(id));
         this.writeTaskMap.set(id, task);
         return task;
     }
 
-    private overrideMapSet = () => {
-        const self = this;
-        let cacheSize = 0;
-        this.database = new Proxy(this.database, {
-            set: (target, key, value) => {
-                target[key] = value;
-                cacheSize++;
-                if (cacheSize > self.config.writeCacheSize) {
-                    cacheSize = 0;
-                    this.writeToDisk();
-                } else {
-                    this.dirty++;
-                }
-                return true;
-            }
-        })
-    }
 
     private _writeToDisk = async () => {
         const { databasePath } = this.config;
         const currentDirtyCount = this.dirty;
+
         if (this.dirty > 0) {
             this.writeToDiskPromise = this.writeToDiskPromise.then(async () => {
                 await fsExtra.writeJSON(databasePath, this.database);

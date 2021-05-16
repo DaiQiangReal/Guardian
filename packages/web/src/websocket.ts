@@ -67,6 +67,12 @@ export default class WebsocketListener{
     }
 
     onDataChanged=({target,value})=>{
-        this.onDataChangedInProps(target,value)
+        if(isNaN(value)){
+            this.onDataChangedInProps(target,value)
+        }else{
+            this.onDataChangedInProps(target,Number(value))
+        }
+        
+        
     }
 }
