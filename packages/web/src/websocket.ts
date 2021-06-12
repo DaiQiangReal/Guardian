@@ -35,6 +35,8 @@ export default class WebsocketListener{
     }
 
     subscribe=(subscribedKey:any[])=>{
+        console.log('dadad',subscribedKey);
+        
         this.promise.then(()=>{
             this.ws.send(JSON.stringify({
                 method:'subscribe',
@@ -46,9 +48,7 @@ export default class WebsocketListener{
 
     private init=()=>{
         this.ws.addEventListener('message',(e)=>{
-            const msgObj=JSONparse(e.data);
-            console.log('message',msgObj);
-            
+            const msgObj=JSONparse(e.data); 
             const {method,data}=msgObj;
             const methodFunc:Function=lodash.get(this.avaliableFuncs,method,()=>{});
             methodFunc(data);
@@ -62,7 +62,6 @@ export default class WebsocketListener{
 
     setDataChangeListener=(callback)=>{
         this.onDataChangedInProps=callback;
-        console.log('callback',callback);
         
     }
 

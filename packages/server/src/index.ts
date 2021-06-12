@@ -1,6 +1,6 @@
 import { Context } from "koa";
 import Server from "./server";
-import lodash from "lodash-es";
+import lodash, { indexOf } from "lodash-es";
 import UserContext from './userContext';
 (async () => {
   const server = new Server(null, 3000);
@@ -31,6 +31,24 @@ import UserContext from './userContext';
 
   })
 
+  const safeParse=(objString:string)=>{
+      try{
+          return JSON.parse(objString);
+      }catch(e){
+        return {};
+      }
+  }
+
+  const safeDecodeUri=(value:unknown):any=>{
+      if(Array.isArray(value)){
+          return value.map(v=>safeDecodeUri(v));
+      }else  if(typeof value === 'string'){
+        return decodeURI(value);
+      }else{
+          return value;
+      }
+  }
+
   server.setRoute("/set", "post", async (ctx: Context) => {
     let queryStr = "";
     ctx.req.on('data', (data) => queryStr += data);
@@ -40,12 +58,18 @@ import UserContext from './userContext';
       })
     })
     const queryObject = lodash.fromPairs(queryStr.split('&').map(singleQueryStr => singleQueryStr.split('=')));
-    const { target, data } = queryObject;
-    if (!target || !data) {
-      ctx.response.body = `Error: set require target && data`;
+    
+    let { target, value } = queryObject;
+    if(!target&&!value){
+        const trueQueryObject=safeParse(Object.keys(queryObject)[0]);
+        target=trueQueryObject.target;
+        value=trueQueryObject.value;
+    }
+    if (!target || !value) {
+      ctx.response.body = `Error: set require target && value`;
       ctx.response.status = 404;
     } else {
-      server.database.write(decodeURI(target), decodeURI(data));
+      server.database.write(decodeURI(target), safeDecodeUri(value));
       ctx.response.body = queryObject;
       ctx.response.status=200;
     }

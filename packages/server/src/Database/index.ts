@@ -76,6 +76,7 @@ class Database {
 
     public write = async (target: string | string[], value: basic) => {
         const id = `${new Date().getTime()}_write_${target}`;
+        
         if (lodash.get(this.database, target, null) !== value) {
             Array.from(this.notifyChangeListenerCollection.values())
                 .forEach(async (listener) => listener(this.database, target, value));        

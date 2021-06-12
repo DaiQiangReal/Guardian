@@ -31,7 +31,7 @@ class UserContext{
     private init=()=>{
         this.ws.addEventListener('message',(e)=>{
             let msgObj=JSONparse(e.data);    
-            const {method,data}=msgObj;     
+            const {method,data}=msgObj;               
             const methodFunc:Function=lodash.get(this.avaliableFuncs,method,()=>{});
             methodFunc(data);
         })
@@ -41,16 +41,17 @@ class UserContext{
 
     private subscribe=(subscribedKey:any[])=>{
         this.subscribedKey=subscribedKey;
-
     }
 
 
     private onDataChanged=(data:any,target:string|string[],value:basic)=>{
 
+        console.log(target,this.subscribedKey);
+
         if(Array.isArray(target)){
             target=target.join('.');
         }
-
+            
         for(let key of this.subscribedKey){
             if(target.indexOf(key)!==-1){
                 this.sendChangedMessage(target,value);

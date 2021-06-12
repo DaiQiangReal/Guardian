@@ -28,6 +28,8 @@ export default () => {
 
     const onDataChanged=useCallback((target,value)=>{
         lodash.set(data,target,value);
+        console.log(data,target,value);
+        
         setData({
             ...data
         })
@@ -37,8 +39,7 @@ export default () => {
 
     const category = useMemo(() => {
         const category = Object.keys(data);
-        setCurrentCategory(category[0]);
-        ref.current.websocketListener?.subscribe([category]);
+        currentCategory===null&&setCurrentCategory(category[0]);
         return category;
     }, [data]);
 
@@ -49,12 +50,13 @@ export default () => {
                 if (!/http/.test(requestUrl)) {
                     requestUrl = "http://" + requestUrl;
                 }
+
                 try {
                     const data=await getData(requestUrl,defaultLimit);
                     if(ref.current.websocketListener){
                         ref.current.websocketListener.close();
                     }
-                    ref.current.websocketListener=new WebsocketListener(serverIP);
+                    ref.current.websocketListener=new WebsocketListener(serverIP);          
                     ref.current.websocketListener?.subscribe([Object.keys(data)[0]]);
                     setData(data);
                 } catch (e) {
@@ -196,7 +198,9 @@ export default () => {
                         <SideNav
                             navData={category}
                             serverIp={serverIP}
-                            onSelect={(category) => setCurrentCategory(category)}
+                            onSelect={(category) =>{
+                                ref.current.websocketListener?.subscribe([category]);setCurrentCategory(category)
+                            }}
                             onServerIpButtonClicked={() => setServerIPModalShow(true)}
                         />
                     </div>
