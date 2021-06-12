@@ -6,9 +6,13 @@
   "author": "daiqiangreal",
   "license": "MIT",
   "scripts": {
-    "start": "export DEV='develop' && electron ."
+    "start": "export DEV='develop' && electron .",
+    "buildWin": "export DEV='production' && electron-builder --win --ia32",
+    "buildLinux": "export DEV='production' && electron-builder --linux --ia32"
   },
-  "dependencies": {
-    "electron": "^12.0.2"
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^13.1.2",
+    "electron-builder": "^22.11.7"
   }
 }
